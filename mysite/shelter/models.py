@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 
 
 class Category(models.Model):
@@ -8,8 +7,10 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
-    def get_url(self):
-        return reverse('category', kwargs={'category_id': self.pk})
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ['title']
 
 
 class Pet(models.Model):
@@ -17,8 +18,14 @@ class Pet(models.Model):
     description = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, default=None)
 
+
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Pet"
+        verbose_name_plural = "Pets"
+        ordering = ['name']
 
 
 class User(models.Model):
@@ -27,3 +34,8 @@ class User(models.Model):
     last_name = models.CharField(max_length=100)
     age = models.IntegerField(default=None)
     pets = models.ManyToManyField(Pet)
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        ordering = ['last_name']

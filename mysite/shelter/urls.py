@@ -1,10 +1,10 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('profile', views.shelter_profile, name='profile'),
-    path('pets_list', views.pets_list, name='pets_list'),
-    path('categories', views.categories, name='categories'),
-    path('category/<int:id_category>/', views.category, name='category'),
+    path('profile/', include('user.urls')),
+    path('pets_list/', include('pet.urls')),
+    path('categories/', include('category.urls')),
+    path('category/', include('category.urls')),
 ]
