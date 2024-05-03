@@ -1,0 +1,47 @@
+version: "3.7"
+
+services:
+  web:
+    build: /Users/soulfade/PycharmProjects/lab_pi/lr2/gunicorn
+    ports:
+      - 8086:8086
+    depends_on:
+      - postgres
+
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - django-app
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:80"
+    environment:
+      - NGINX_PORT=80
+
+  postgres:
+    hostname: postgres-host
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U polmustdie -d polmustdie_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    environment:
+      - POSTGRES_DB=polmustdie_db
+      - POSTGRES_USER=polmustdie
+      - POSTGRES_PASSWORD=postgres
+
+  django-app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/usr/src/app
+    entrypoint: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"

@@ -1,5 +1,6 @@
 import json
 
+from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -15,20 +16,6 @@ def all_pets(request):
         return JsonResponse({
             'Pet': list(pets.values())
         })
-
-# def find_pet(request):
-#     if request.method == 'GET':
-#
-#
-#
-#         pet_name = request.GET.get("pet_name", None)
-#         if not pet_name:
-#             return JsonResponse({"status": False, "msg": "Pet name is required"})
-#         pet = Pet.objects.filter(title=pet_name).values()
-#         return JsonResponse({
-#             'Pet': list(pet.values())
-#         })
-
 
 def pet(request, id_pet):
     queryset_profile = Pet.objects.filter(id=id_pet).order_by("id")
@@ -48,6 +35,14 @@ def pet(request, id_pet):
         'Description': str(pet.description),
         'Foster Parent': string
     })
+
+def pet_by_name(request, pet_name):
+    pets = (Pet.objects
+                       .filter(Q(name__icontains=pet_name))
+                       .all().values())
+    pets_json = list(pets)
+    return JsonResponse({"Pets": pets_json})
+
 
 @csrf_exempt
 def add_pet(request):
